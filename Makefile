@@ -11,7 +11,11 @@ GOINST=$(GOCMD) install
 MODULE_NAME=github.com/solrac97gr/go-shield
 
 # Binary name
-BINARY_NAME=main
+BINARY_NAME=bin/go-shield
+
+#Build for Mac:Intel
+build-mac-intel:
+	@GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) ./cmd/console
 
 # Build
 build-console:
