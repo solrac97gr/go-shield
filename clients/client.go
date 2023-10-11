@@ -1,6 +1,8 @@
 package clients
 
 type Client interface {
-	GetHostForCheckFromUser() (ip string)
+	GetHost() (ip string)
 	GetOpenPortsUserInfo() (host string, from, limit int)
+	GetFilePath() (filepath string)
+	GetHash() (hash string)
 }

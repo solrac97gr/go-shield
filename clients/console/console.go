@@ -17,10 +17,24 @@ func NewConsoleClient() *ConsoleClient {
 
 var _ clients.Client = &ConsoleClient{}
 
-// GetHostForCheckFromUser prompts the user to enter the hostname to check and returns the input.
-func (*ConsoleClient) GetHostForCheckFromUser() (host string) {
+// GetHost prompts the user to enter the hostname to check and returns the input.
+func (*ConsoleClient) GetHost() (host string) {
 	fmt.Print("Enter the hostname to check: ")
 	fmt.Scanln(&host)
+	return
+}
+
+// GetFilePath prompts the user to enter the file path to check and returns the input.
+func (*ConsoleClient) GetFilePath() (filepath string) {
+	fmt.Print("Enter the file path of the file: ")
+	fmt.Scanln(&filepath)
+	return
+}
+
+// GetHash prompts the user to enter the hash to check and returns the input.
+func (*ConsoleClient) GetHash() (hash string) {
+	fmt.Print("Enter the expected hash of the file: ")
+	fmt.Scanln(&hash)
 	return
 }
 
