@@ -11,4 +11,4 @@ Is a tool for compile some cybersecurity scripts I normally use for investigate 
 - Whois: Get the WhoIs report of a Host
 - File Integrity:
     - Generate a Hash of a File
-    - Verify is a Has and a File match
+    - Verify if a Hash and a File match
