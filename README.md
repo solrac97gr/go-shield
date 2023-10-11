@@ -4,11 +4,11 @@ Is a tool for compile some cybersecurity scripts I normally use for investigate 
 
 ![go-shield](./images/Screenshot%202023-10-11%20at%2020.29.38.png)
 
-# Avaliable
+## Avaliable
 
-[x] Check IP: Return the IP of Host
-[x] Scan Ports: Scan ports of a Host
-[x] Whois: Get the WhoIs report of a Host
-[x] File Integrity:
-    [x] Generate a Hash of a File
-    [x] Verify is a Has and a File match
+- Check IP: Return the IP of Host
+- Scan Ports: Scan ports of a Host
+- Whois: Get the WhoIs report of a Host
+- File Integrity:
+    - Generate a Hash of a File
+    - Verify is a Has and a File match
