@@ -26,3 +26,7 @@ build-console:
 run-console: build-console
 	@echo "🚀 Running App"
 	@./$(BINARY_NAME)
+
+# Clean
+clean:
+	@rm -r ./bin
