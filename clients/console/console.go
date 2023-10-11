@@ -24,6 +24,13 @@ func (*ConsoleClient) GetHost() (host string) {
 	return
 }
 
+// GetImagePath prompts the user to enter the image path to check and returns the input.
+func (*ConsoleClient) GetImagePath() (imagePath string) {
+	fmt.Print("Enter the image path: ")
+	fmt.Scanln(&imagePath)
+	return
+}
+
 // GetFilePath prompts the user to enter the file path to check and returns the input.
 func (*ConsoleClient) GetFilePath() (filepath string) {
 	fmt.Print("Enter the file path of the file: ")

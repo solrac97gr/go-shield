@@ -10,6 +10,7 @@ import (
 	"github.com/solrac97gr/go-shield/clients"
 	fileintegritychecker "github.com/solrac97gr/go-shield/tools/file-integrity-checker"
 	ipchecker "github.com/solrac97gr/go-shield/tools/ip-checker"
+	"github.com/solrac97gr/go-shield/tools/metadata"
 	portscanner "github.com/solrac97gr/go-shield/tools/port-scanner"
 	whoischecker "github.com/solrac97gr/go-shield/tools/whois-checker"
 )
@@ -20,9 +21,10 @@ type Orchestrator struct {
 	PortScanner          *portscanner.PortScanner
 	WhoIsChecker         *whoischecker.WhoIsChecker
 	FileIntegrityChecker *fileintegritychecker.FileIntegrityChecker
+	MetaDataCleanner     *metadata.MetaDataTools
 }
 
-func NewOrchestrator(c clients.Client, ipChecker *ipchecker.IPChecker, portScanner *portscanner.PortScanner, whoisCheck *whoischecker.WhoIsChecker, fileIntegrityChecker *fileintegritychecker.FileIntegrityChecker) *Orchestrator {
+func NewOrchestrator(c clients.Client, ipChecker *ipchecker.IPChecker, portScanner *portscanner.PortScanner, whoisCheck *whoischecker.WhoIsChecker, fileIntegrityChecker *fileintegritychecker.FileIntegrityChecker, metadataCleanner *metadata.MetaDataTools) *Orchestrator {
 	if c == nil {
 		panic("nil client")
 	}
@@ -38,12 +40,16 @@ func NewOrchestrator(c clients.Client, ipChecker *ipchecker.IPChecker, portScann
 	if fileIntegrityChecker == nil {
 		panic("nil file integrity checker")
 	}
+	if metadataCleanner == nil {
+		panic("nil metadata cleanner")
+	}
 	return &Orchestrator{
 		Client:               c,
 		IPChecker:            ipChecker,
 		PortScanner:          portScanner,
 		WhoIsChecker:         whoisCheck,
 		FileIntegrityChecker: fileIntegrityChecker,
+		MetaDataCleanner:     metadataCleanner,
 	}
 }
 
@@ -53,6 +59,8 @@ func (o *Orchestrator) showMenu() {
 	fmt.Println("2. Scan Ports 📡")
 	fmt.Println("3. Who is 🤔")
 	fmt.Println("4. File integrity 🗒️")
+	fmt.Println("5. Clean EXIF Metadata (IOS Images)")
+	fmt.Println("6. Read EXIF Metadata (IOS Images)")
 	fmt.Println("0. Exit ❌")
 	fmt.Print("Enter your choice: ")
 
@@ -70,6 +78,10 @@ func (o *Orchestrator) showMenu() {
 		o.whoIs()
 	case 4:
 		o.showFileIntegritySubMenu()
+	case 5:
+		o.cleanEFIXMetadata()
+	case 6:
+		o.readEFIXMetadata()
 	default:
 		fmt.Println("Invalid choice")
 	}
@@ -151,4 +163,22 @@ func (o *Orchestrator) verifyFileHash() {
 		return
 	}
 	fmt.Println("the file is secure 👍")
+}
+
+func (o *Orchestrator) cleanEFIXMetadata() {
+	imagepath := o.Client.GetImagePath()
+	err := o.MetaDataCleanner.CleanEXIFMetaData(imagepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Data cleanned succesfully 🧹")
+}
+
+func (o *Orchestrator) readEFIXMetadata() {
+	imagepath := o.Client.GetImagePath()
+	result, err := o.MetaDataCleanner.ReadEXIFMetaData(imagepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(result)
 }

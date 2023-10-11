@@ -5,4 +5,5 @@ type Client interface {
 	GetOpenPortsUserInfo() (host string, from, limit int)
 	GetFilePath() (filepath string)
 	GetHash() (hash string)
+	GetImagePath() (imagePath string)
 }
