@@ -12,5 +12,10 @@ Is a tool for compile some cybersecurity scripts I normally use for investigate 
 - File Integrity:
     - Generate a Hash of a File
     - Verify if a Hash and a File match
-- Clean EXIF Metadata (IOS Images): Delete data of images in EXIF tags like location add by IOS
-- Read EFIX Metadata (IOS Images): Read all EXIF Data in a image
+- Metadata Manipulation:
+    - Clean EXIF Metadata (IOS Images): Delete data of images in EXIF tags like location add by IOS
+    - Read EFIX Metadata (IOS Images): Read all EXIF Data in a image
+- Generate Password: Generate a safe password by default using letter,numbers and symbols
+- File encryptation
+    - Encrypt File: Generate encrypted file and the password for decrypt
+    - Decrypt File: Decrypt a file using the generated password
