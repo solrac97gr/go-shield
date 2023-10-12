@@ -1,6 +1,6 @@
 # Go Shield 🛡️
 
-Is a tool for compile some cybersecurity scripts I normally use for investigate possible SCAM pages in Pishing mails
+Is a tool for compile some cybersecurity scripts I normally use for investigate possible SCAM pages in Phishing mails
 
 ![go-shield](./images/image.png)
 
