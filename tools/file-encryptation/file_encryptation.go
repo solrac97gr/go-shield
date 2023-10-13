@@ -4,8 +4,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"errors"
 	"io"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 )
@@ -16,160 +17,92 @@ func NewFileEncryptor() *FileEncryptor {
 	return &FileEncryptor{}
 }
 
-func (fe *FileEncryptor) EncryptFile(filePath string) (outputPath string, password string, err error) {
-	// Generate a random password
-	password = generateRandomPassword()
+func (fe *FileEncryptor) EncryptFile(filePath string) (outputPath, generatedPassword string, err error) {
+	outputPath = getEncryptedFilePath(filePath)
+	generatedPassword = generateRandomPassword()
 
-	// Open the input file
-	inputFile, err := os.Open(filePath)
-	if err != nil {
-		return "", "", err
-	}
-	defer inputFile.Close()
-
-	// Create the output file
-	outputPath = getOutputFilePath(filePath)
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return "", "", err
-	}
-	defer outputFile.Close()
-
-	// Generate a random key and IV
-	key := make([]byte, 32)
-	_, err = rand.Read(key)
-	if err != nil {
-		return "", "", err
-	}
-	iv := make([]byte, aes.BlockSize)
-	_, err = rand.Read(iv)
+	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return "", "", err
 	}
 
-	// Write the key and IV to the output file
-	_, err = outputFile.Write(key)
-	if err != nil {
-		return "", "", err
-	}
-	_, err = outputFile.Write(iv)
-	if err != nil {
-		return "", "", err
-	}
-
-	// Create the AES cipher block
+	key := []byte(generatedPassword)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", "", err
 	}
 
-	// Create the stream cipher with the IV
-	stream := cipher.NewCFBEncrypter(block, iv)
-
-	// Encrypt and write the file content to the output file
-	buffer := make([]byte, 4096)
-	for {
-		n, err := inputFile.Read(buffer)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return "", "", err
-		}
-		stream.XORKeyStream(buffer[:n], buffer[:n])
-		_, err = outputFile.Write(buffer[:n])
-		if err != nil {
-			return "", "", err
-		}
+	encrypted := make([]byte, aes.BlockSize+len(input))
+	iv := encrypted[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", "", err
 	}
 
-	return outputPath, password, nil
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(encrypted[aes.BlockSize:], input)
+
+	err = ioutil.WriteFile(outputPath, encrypted, 0644)
+	if err != nil {
+		return "", "", err
+	}
+
+	return outputPath, generatedPassword, nil
 }
 
 func (fe *FileEncryptor) DecryptFile(filePath string, password string) (outputPath string, err error) {
-	// Open the input file
-	inputFile, err := os.Open(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer inputFile.Close()
+	outputPath = getDecryptedFilePath(filePath)
 
-	// Read the key and IV from the input file
-	key := make([]byte, 32)
-	_, err = inputFile.Read(key)
-	if err != nil {
-		return "", err
-	}
-	iv := make([]byte, aes.BlockSize)
-	_, err = inputFile.Read(iv)
+	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return "", err
 	}
 
-	// Create the AES cipher block
+	key := []byte(password)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
 
-	// Create the stream cipher with the IV
-	stream := cipher.NewCFBDecrypter(block, iv)
+	if len(input) < aes.BlockSize {
+		return "", errors.New("invalid file")
+	}
 
-	// Create the output file
-	outputPath = getDecryptedFilePath(filePath)
-	outputFile, err := os.Create(outputPath)
+	iv := input[:aes.BlockSize]
+	encrypted := input[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(encrypted, encrypted)
+
+	err = ioutil.WriteFile(outputPath, encrypted, 0644)
 	if err != nil {
 		return "", err
-	}
-	defer outputFile.Close()
-
-	// Decrypt and write the file content to the output file
-	buffer := make([]byte, 4096)
-	for {
-		n, err := inputFile.Read(buffer)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return "", err
-		}
-		stream.XORKeyStream(buffer[:n], buffer[:n])
-		_, err = outputFile.Write(buffer[:n])
-		if err != nil {
-			return "", err
-		}
 	}
 
 	return outputPath, nil
 }
 
-// Helper function to generate a random password
-func generateRandomPassword() string {
-	const passwordLength = 16
-	const passwordCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	password := make([]byte, passwordLength)
-	_, err := rand.Read(password)
-	if err != nil {
-		panic(err)
-	}
-
-	for i := 0; i < passwordLength; i++ {
-		password[i] = passwordCharset[int(password[i])%len(passwordCharset)]
-	}
-
-	return string(password)
+func getEncryptedFilePath(filePath string) string {
+	ext := filepath.Ext(filePath)
+	fileName := strings.TrimSuffix(filepath.Base(filePath), ext)
+	return filepath.Join(filepath.Dir(filePath), fileName+".encrypted")
 }
 
-// Helper function to get the decrypted file path
 func getDecryptedFilePath(filePath string) string {
 	ext := filepath.Ext(filePath)
 	fileName := strings.TrimSuffix(filepath.Base(filePath), ext)
 	return filepath.Join(filepath.Dir(filePath), fileName+".decrypted")
 }
 
-// Helper function to get the output file path
-func getOutputFilePath(filePath string) string {
-	fileName := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
-	return filepath.Join(filepath.Dir(filePath), fileName+".encrypt")
+func generateRandomPassword() string {
+	const passwordLength = 16
+	const passwordCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	password := make([]byte, passwordLength)
+	_, err := rand.Read(password)
+	if err != nil {
+		panic(err)
+	}
+	for i := 0; i < passwordLength; i++ {
+		password[i] = passwordCharset[int(password[i])%len(passwordCharset)]
+	}
+	return string(password)
 }
