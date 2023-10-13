@@ -264,7 +264,7 @@ func (o *Orchestrator) encryptFile() {
 	}
 	fmt.Printf("Output: %s", outputPath)
 	fmt.Println()
-	fmt.Printf("Password: %s", password)
+	fmt.Printf("Key: %s", password)
 	fmt.Println()
 }
 

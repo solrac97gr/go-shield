@@ -17,16 +17,16 @@ func NewFileEncryptor() *FileEncryptor {
 	return &FileEncryptor{}
 }
 
-func (fe *FileEncryptor) EncryptFile(filePath string) (outputPath, generatedPassword string, err error) {
+func (fe *FileEncryptor) EncryptFile(filePath string) (outputPath, generatedKey string, err error) {
 	outputPath = getEncryptedFilePath(filePath)
-	generatedPassword = generateRandomPassword()
+	generatedKey = generateRandomKey()
 
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return "", "", err
 	}
 
-	key := []byte(generatedPassword)
+	key := []byte(generatedKey)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", "", err
@@ -46,10 +46,10 @@ func (fe *FileEncryptor) EncryptFile(filePath string) (outputPath, generatedPass
 		return "", "", err
 	}
 
-	return outputPath, generatedPassword, nil
+	return outputPath, generatedKey, nil
 }
 
-func (fe *FileEncryptor) DecryptFile(filePath string, password string) (outputPath string, err error) {
+func (fe *FileEncryptor) DecryptFile(filePath string, generatedKey string) (outputPath string, err error) {
 	outputPath = getDecryptedFilePath(filePath)
 
 	input, err := ioutil.ReadFile(filePath)
@@ -57,7 +57,7 @@ func (fe *FileEncryptor) DecryptFile(filePath string, password string) (outputPa
 		return "", err
 	}
 
-	key := []byte(password)
+	key := []byte(generatedKey)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
@@ -93,9 +93,9 @@ func getDecryptedFilePath(filePath string) string {
 	return filepath.Join(filepath.Dir(filePath), fileName+".decrypted")
 }
 
-func generateRandomPassword() string {
-	const passwordLength = 16
-	const passwordCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+func generateRandomKey() string {
+	const passwordLength = 32
+	const passwordCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@-()=+%^&*!$"
 	password := make([]byte, passwordLength)
 	_, err := rand.Read(password)
 	if err != nil {

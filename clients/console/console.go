@@ -94,6 +94,6 @@ func (c *ConsoleClient) GetBool(msg string) (is bool) {
 
 func (c *ConsoleClient) GetDecryptFileInfo() (filePath string, password string) {
 	filePath = c.GetString("Enter the file path: ")
-	password = c.GetString("Enter the file password: ")
+	password = c.GetString("Enter the file generated key: ")
 	return
 }
