@@ -1,21 +1,21 @@
 # Go Shield 🛡️
 
-Is a tool for compile some cybersecurity scripts I normally use for investigate possible SCAM pages in Phishing mails
+This tool is designed to compile various cybersecurity scripts that are commonly used for investigating potential SCAM pages in phishing emails. Its purpose is to enhance the efficiency and effectiveness of such investigations.
 
 ![go-shield](./images/image.png)
 
 ## Avaliable
 
-- Check IP: Return the IP of Host
-- Scan Ports: Scan ports of a Host
-- Whois: Get the WhoIs report of a Host
-- File Integrity:
-    - Generate a Hash of a File
-    - Verify if a Hash and a File match
-- Metadata Manipulation:
-    - Clean EXIF Metadata (IOS Images): Delete data of images in EXIF tags like location add by IOS
-    - Read EFIX Metadata (IOS Images): Read all EXIF Data in a image
-- Generate Password: Generate a safe password by default using letter,numbers and symbols
-- File encryptation
-    - Encrypt File: Generate encrypted file and the password for decrypt
-    - Decrypt File: Decrypt a file using the generated password
+- IP Check: Retrieve the IP address of a Host. 
+- Port Scan: Scan the ports of a Host. 
+- Whois Lookup: Obtain the Whois report of a Host. 
+- File Integrity: 
+    - Generate File Hash: Create a hash value for a File. 
+    - Verify Hash and File: Validate if a Hash matches a File. 
+- Metadata Manipulation: 
+    - Clean EXIF Metadata (IOS Images): Remove EXIF tag data, such as location information added by IOS, from images. 
+    - Read EXIF Metadata (IOS Images): Extract all EXIF data from an image.
+- Password Generation: Generate a secure password using letters, numbers, and symbols by default 
+- File Encryption: 
+    - Encrypt File: Generate an encrypted file along with a password for decryption. 
+    - Decrypt File: Decrypt a file using the provided password.
